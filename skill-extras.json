@@ -1,0 +1,11 @@
+{
+  "technical-deliverable-product-manager": {
+    "title": "展示型技术成果 · 产品经理",
+    "companions": ["reader-facing-document-review"],
+    "externalSkills": ["grilling"]
+  },
+  "reader-facing-document-review": {
+    "title": "展示型技术成果 · 独立审稿人",
+    "agents": ["setup/reader_doc_reviewer.toml"]
+  }
+}

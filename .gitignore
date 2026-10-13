@@ -1,0 +1,11 @@
+node_modules/
+*.tgz
+.tmp/
+coverage/
+.env
+.env.*
+!.env.example
+.agents/
+.codex/
+.DS_Store
+Thumbs.db
