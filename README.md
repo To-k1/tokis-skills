@@ -13,23 +13,25 @@
 
 需要 Node.js 20+ 和 npm。当前先通过 GitHub 分发，**无需先发布到 npm**。以下命令需仓库已推送、网络可访问 GitHub；从 GitHub 安装也需要 Git。
 
+本机使用 npm 12；该版本默认禁用 Git 来源下载，所以以下命令为本次调用添加 `--allow-git=all`，不修改全局 npm 配置。旧版 npm 若不识别此参数，可以省略。参见 [npm allow-git 官方说明](https://docs.npmjs.com/cli/v12/using-npm/config/#allow-git)。
+
 在要使用 skill 的项目目录中运行：
 
 ```sh
 # 查看可用 skill
-npx --yes --package=github:To-k1/tokis-skills tokis-skills list
+npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills list
 
 # 单个安装：产品经理
-npx --yes --package=github:To-k1/tokis-skills tokis-skills install technical-deliverable-product-manager
+npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install technical-deliverable-product-manager
 
 # 单个安装：审稿人（自动复制配套 Agent 配置）
-npx --yes --package=github:To-k1/tokis-skills tokis-skills install reader-facing-document-review
+npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install reader-facing-document-review
 
 # 全部安装
-npx --yes --package=github:To-k1/tokis-skills tokis-skills install --all
+npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install --all
 
 # 安装到当前用户，供所有项目使用
-npx --yes --package=github:To-k1/tokis-skills tokis-skills install --all --global
+npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install --all --global
 ```
 
 默认安装到当前项目 `.agents/skills/`。`--global`（或 `--scope user`）安装到 `~/.agents/skills/`。审稿人的 Agent 配置同时进入对应范围的 `.codex/agents/reader_doc_reviewer.toml`。不修改 `config.toml`；`--no-agent` 可以跳过 Agent 配置。

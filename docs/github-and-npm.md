@@ -49,7 +49,7 @@ git push
 
 ## GitHub 分发与 npm 分发
 
-GitHub push 后即可使用 README 中 `npx --package=github:To-k1/tokis-skills ...` 的命令。通过 npm 注册表发布后，才可以使用简短的 `npx tokis-skills@latest ...` 命令。两者是不同的发布渠道，push 不会自动发布 npm。
+GitHub push 后即可使用 README 中 `npx --allow-git=all --package=github:To-k1/tokis-skills ...` 的命令。npm 12 默认禁用 Git 来源，`--allow-git=all` 仅为这次运行允许 Git 下载，不改变全局配置；旧版本若不认识此参数可省略。通过 npm 注册表发布后，才可以使用简短的 `npx tokis-skills@latest ...` 命令。两者是不同的发布渠道，push 不会自动发布 npm。
 
 发布前先决定许可证及 npm 包名归属。`tokis-skills` 是否空闲需用 `npm view tokis-skills name` 检查；如果已被占用，使用你拥有的 npm scope，例如 `@你的npm用户名/tokis-skills`，并同步修改 `package.json` 和安装示例。GitHub 用户名不等于 npm 用户名。
 
