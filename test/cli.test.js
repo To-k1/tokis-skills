@@ -82,6 +82,7 @@ test('invalid selection and incompatible options fail without partial installs',
     ['install', '--all', '--scope', 'invalid'],
     ['install', '--all', '--dry-run', '--check'],
     ['install', '--all', '--glboal'],
+    ['install'],
     ['list', '--global']
   ]) {
     await assert.rejects(exec(process.execPath, [cli, ...args], { cwd: dir }), error => error.code === 1);

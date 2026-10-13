@@ -9,47 +9,67 @@
 | `technical-deliverable-product-manager` | 主导展示型技术成果交付，协调需求、证据、制作与独立审稿 |
 | `reader-facing-document-review` | 对展示型文档先冷读、再核对证据；附带只读审稿 Agent |
 
-## 安装
+## 交互式安装
 
-需要 Node.js 20+ 和 npm。当前先通过 GitHub 分发，**无需先发布到 npm**。以下命令需仓库已推送、网络可访问 GitHub；从 GitHub 安装也需要 Git。
+推荐在终端运行，菜单会让你选择 skill（单个、多选或全部）、项目/用户范围，最后显示安装路径并确认。方向键移动，空格勾选，回车继续，Ctrl+C 取消。
 
-本机使用 npm 12；该版本默认禁用 Git 来源下载，所以以下命令为本次调用添加 `--allow-git=all`，不修改全局 npm 配置。旧版 npm 若不识别此参数，可以省略。参见 [npm allow-git 官方说明](https://docs.npmjs.com/cli/v12/using-npm/config/#allow-git)。
+### 使用通用 skills 安装器
 
-在要使用 skill 的项目目录中运行：
+与其他 skill 仓库一样，可以直接使用生态中的标准 CLI：
 
 ```sh
-# 查看可用 skill
-npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills list
-
-# 单个安装：产品经理
-npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install technical-deliverable-product-manager
-
-# 单个安装：审稿人（自动复制配套 Agent 配置）
-npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install reader-facing-document-review
-
-# 全部安装
-npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install --all
-
-# 安装到当前用户，供所有项目使用
-npx --yes --allow-git=all --package=github:To-k1/tokis-skills tokis-skills install --all --global
+npx skills@latest add To-k1/tokis-skills
 ```
 
-默认安装到当前项目 `.agents/skills/`。`--global`（或 `--scope user`）安装到 `~/.agents/skills/`。审稿人的 Agent 配置同时进入对应范围的 `.codex/agents/reader_doc_reviewer.toml`。不修改 `config.toml`；`--no-agent` 可以跳过 Agent 配置。
+它会发现本仓库的两个 skills，并按其交互流程选择 skills、目标工具、范围及安装方式。已实测仓库发现与 skill 列表。参考 [skills 官方项目](https://github.com/vercel-labs/skills)。
 
-`--project-dir "路径"` 指定另一项目；`--dry-run` 预览；`--check` 检查目标内容是否与本包一致，缺失或不同会返回非零退出码。重复安装内容相同则跳过；有变化则先将整份旧 skill 放到 `.agents/skill-backups/`，旧 Agent 配置放到 `.codex/agent-backups/`，再安装新版。备份保留本地修改和已移除文件，可按输出路径找回。
+通用安装器复制或链接 skill 内容，不会根据本仓库的 skill-extras.json 自动配置 Codex 自定义 Agent。审稿人 skill 中的 setup/reader_doc_reviewer.toml 仍可按其安装说明手动复制到对应 .codex/agents/ 目录；要通过菜单一起安装该配置，使用下面的专用入口。
 
-正式版本可以将 `github:To-k1/tokis-skills` 改为 `github:To-k1/tokis-skills#v0.1.0`（先创建该 tag）。开发期间需要获取最新提交时，在包地址后加 `#main`；如果仍命中 npm 缓存，用具体提交 SHA 固定版本。
+### Toki 的 Codex 安装菜单
 
-也可以先克隆，再离线安装：
+需要 Node.js 20.12+、npm 和 Git。当前从 GitHub 分发，无需先发布 npm。
+
+```sh
+npx --allow-git=all github:To-k1/tokis-skills#main
+```
+
+无参数即打开菜单：
+
+1. 选择「全部安装」，或勾选需要的单个/多个 skill。
+2. 选择「当前项目」或「当前用户的所有项目」。
+3. 选中审稿人时，选择是否安装配套 Codex Agent 配置。
+4. 查看安装路径并确认执行。
+
+目标工具固定为 Codex。项目范围进入当前目录的 .agents/skills/，用户范围进入 ~/.agents/skills/。Agent 配置进入对应范围的 .codex/agents/reader_doc_reviewer.toml，不修改 config.toml。菜单中取消不会开始安装。
+
+本机 npm 12 默认禁用 Git 来源，所以专用入口为本次运行添加 --allow-git=all，不改变全局配置。旧 npm 若不认识该参数可以省略。参见 [npm 官方说明](https://docs.npmjs.com/cli/v12/using-npm/config/#allow-git)。通用入口从 npm 注册表获取 skills CLI，不需要此参数。
+
+克隆后也可以运行菜单：
 
 ```sh
 git clone https://github.com/To-k1/tokis-skills.git
 cd tokis-skills
-node bin/tokis-skills.js list
-node bin/tokis-skills.js install --all --project-dir "你的项目路径"
+npm ci --ignore-scripts
+node bin/tokis-skills.js
 ```
 
-CLI 没有运行时第三方依赖，不需要 Python，不在安装过程中下载其他 skill。
+菜单使用 [Clack](https://github.com/bombshell-dev/clack)，不需要 Python。依赖装好后本地复制过程不联网，也不自动下载第三方 skill。
+
+### 脚本与自动化
+
+需要自动化时仍可指定名称或 --all，无需进入菜单：
+
+```sh
+node bin/tokis-skills.js list
+node bin/tokis-skills.js install reader-facing-document-review
+node bin/tokis-skills.js install --all --scope user
+```
+
+--project-dir 指定目标项目；--dry-run 预览；--check 比对安装内容；--no-agent 跳过 Agent 配置。没有交互终端且未指定安装项时会提示使用名称或 --all，不会自动安装全部。
+
+重复安装内容相同则跳过；有变化则先将整份旧 skill 放到 .agents/skill-backups/，旧 Agent 配置放到 .codex/agent-backups/，再安装新版。备份保留本地修改和已移除文件，可按输出路径找回。
+
+正式发布后可用版本 tag 或提交 SHA 固定 GitHub 包版本；#main 用于获取当前分支。如果 npm 缓存仍返回旧版，可改用具体提交 SHA。
 
 ## 使用
 

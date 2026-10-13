@@ -49,7 +49,7 @@ git push
 
 ## GitHub 分发与 npm 分发
 
-GitHub push 后即可使用 README 中 `npx --allow-git=all --package=github:To-k1/tokis-skills ...` 的命令。npm 12 默认禁用 Git 来源，`--allow-git=all` 仅为这次运行允许 Git 下载，不改变全局配置；旧版本若不认识此参数可省略。通过 npm 注册表发布后，才可以使用简短的 `npx tokis-skills@latest ...` 命令。两者是不同的发布渠道，push 不会自动发布 npm。
+GitHub push 后即可运行 `npx skills@latest add To-k1/tokis-skills` 使用通用安装菜单，或运行 `npx --allow-git=all github:To-k1/tokis-skills#main` 使用带 Codex Agent 配置的专用菜单。npm 12 默认禁用 Git 来源，`--allow-git=all` 仅为这次运行允许 Git 下载，不改变全局配置；旧版本若不认识此参数可省略。通过 npm 注册表发布后，才可以使用简短的 `npx tokis-skills@latest ...` 命令。两者是不同的发布渠道，push 不会自动发布 npm。
 
 发布前先决定许可证及 npm 包名归属。`tokis-skills` 是否空闲需用 `npm view tokis-skills name` 检查；如果已被占用，使用你拥有的 npm scope，例如 `@你的npm用户名/tokis-skills`，并同步修改 `package.json` 和安装示例。GitHub 用户名不等于 npm 用户名。
 
@@ -68,12 +68,11 @@ npm publish --access public
 npm 发布是外部操作，这份教程不代表本次已经发布。按照 npm 当前登录流程完成浏览器登录/双因素验证。无 scope 的包发布后：
 
 ```sh
-npx tokis-skills@latest list
-npx tokis-skills@latest install reader-facing-document-review
-npx tokis-skills@latest install --all --global
+npx tokis-skills@latest
+# 默认打开交互安装菜单；自动化时才添加 install 等参数
 ```
 
-使用 scope 时，例如包名是 `@example/tokis-skills`，命令变为 `npx @example/tokis-skills@latest install --all`；可执行文件名仍为 `tokis-skills`。
+使用 scope 时，例如包名是 `@example/tokis-skills`，命令变为 `npx @example/tokis-skills@latest`；可执行文件名仍为 `tokis-skills`。
 
 版本 `0.1.0` 可在确认首版可交付后打 tag：
 

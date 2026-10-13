@@ -1,18 +1,35 @@
 {
   "name": "tokis-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Toki's Skills — 可单独或批量安装的 Codex skill 合集",
   "type": "module",
-  "bin": { "tokis-skills": "bin/tokis-skills.js" },
-  "engines": { "node": ">=20" },
-  "files": ["bin/", "lib/", "skills/", "skill-extras.json", "README.md", "docs/"],
+  "bin": {
+    "tokis-skills": "bin/tokis-skills.js"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "skills/",
+    "skill-extras.json",
+    "README.md",
+    "docs/"
+  ],
   "scripts": {
     "test": "node --test",
     "validate": "node bin/tokis-skills.js review --all",
     "prepack": "npm run validate"
   },
-  "repository": { "type": "git", "url": "git+https://github.com/To-k1/tokis-skills.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/To-k1/tokis-skills.git"
+  },
   "homepage": "https://github.com/To-k1/tokis-skills#readme",
   "bugs": "https://github.com/To-k1/tokis-skills/issues",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@clack/prompts": "^1.8.1"
+  }
 }

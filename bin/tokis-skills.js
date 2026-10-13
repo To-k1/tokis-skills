@@ -5,9 +5,12 @@ import os from 'node:os';
 import { parseArgs } from 'node:util';
 import { ROOT, catalog, select, review, validName, exists } from '../lib/catalog.js';
 import { install, plan } from '../lib/install.js';
+import { chooseInstall } from '../lib/interactive.js';
 
 const help = `Toki's Skills
 
+  tokis-skills                  打开交互式安装菜单
+  tokis-skills install          打开交互式安装菜单
   tokis-skills list
   tokis-skills install <skill-name> [other-skill-name ...]
   tokis-skills install --all
@@ -38,8 +41,10 @@ async function main() {
   if (values.version) {
     console.log(JSON.parse(await fs.readFile(path.join(ROOT, 'package.json'), 'utf8')).version); return;
   }
-  const [command, ...names] = positionals;
-  if (values.help || !command) { console.log(help); return; }
+  const [inputCommand, ...names] = positionals;
+  if (values.help) { console.log(help); return; }
+  if (!inputCommand && !process.stdin.isTTY && !Object.keys(values).length) { console.log(help); return; }
+  const command = inputCommand ?? 'install';
   const allowed = {
     list: [], install: ['all', 'scope', 'global', 'project-dir', 'dry-run', 'check', 'no-agent'],
     review: ['all'], create: ['description']
@@ -66,7 +71,25 @@ async function main() {
     for (const skill of skills) console.log(`${skill.name}\n  ${skill.title ?? skill.name}\n  ${skill.description}\n`);
     return;
   }
-  const chosen = select(skills, names, values.all);
+  let scope = values.global ? 'user' : values.scope ?? 'project';
+  let noAgent = values['no-agent'];
+  if (command === 'install') {
+    if (values.global && values.scope && values.scope !== 'user') throw new Error('--global 与 --scope project 冲突');
+    if (!['project', 'user'].includes(scope)) throw new Error('--scope 必须是 project 或 user');
+    if (scope === 'user' && values['project-dir']) throw new Error('--project-dir 只适用于 --scope project');
+    if (values['dry-run'] && values.check) throw new Error('--dry-run 与 --check 不能同时使用');
+  }
+  const interactive = command === 'install' && !names.length && !values.all;
+  let chosen;
+  if (interactive) {
+    if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('交互式安装需要终端。请在终端运行 tokis-skills，或为脚本指定 skill 名称 / --all');
+    const choice = await chooseInstall(skills, {
+      global: values.global, scope: values.scope, projectDir: values['project-dir'],
+      noAgent, dryRun: values['dry-run'], check: values.check
+    });
+    if (!choice) return;
+    ({ chosen, scope, noAgent } = choice);
+  } else chosen = select(skills, names, values.all);
   const reports = await review(chosen);
   for (const report of reports) {
     if (command === 'review') console.log(`[${report.errors.length ? 'FAIL' : 'OK'}] ${report.name} (${report.files} files)`);
@@ -76,10 +99,7 @@ async function main() {
   if (command === 'review') {
     console.log('结构检查完成。角色行为、证据边界和独立审稿仍需实际试用。'); return;
   }
-  if (values.global && values.scope && values.scope !== 'user') throw new Error('--global 与 --scope project 冲突');
-  const scope = values.global ? 'user' : values.scope ?? 'project';
-  if (scope === 'user' && values['project-dir']) throw new Error('--project-dir 只适用于 --scope project');
-  const items = plan(chosen, { scope, projectDir: values['project-dir'], noAgent: values['no-agent'] });
+  const items = plan(chosen, { scope, projectDir: values['project-dir'], noAgent });
   if (!await install(items, { dryRun: values['dry-run'], check: values.check })) process.exitCode = 1;
   for (const skill of chosen) {
     for (const companion of skill.companions ?? []) {
